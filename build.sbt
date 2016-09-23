@@ -8,7 +8,8 @@ libraryDependencies ++= Vector(
   Library.akkaStreams,
   Library.akkaTestkit % "test",
   Library.akkaStreamsTestkit % "test",
-  Library.akkaStreamsKafka
+  Library.akkaStreamsKafka,
+  Library.playJson
 )
 
 initialCommands := """|import de.gitzoz.akkastreamkafkasample._
