@@ -33,26 +33,28 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 
 object MessageProducer {
-  def settings(system: ActorSystem) =
+  def settings(system: ActorSystem, host: String, port: Int) =
     ProducerSettings(system, new ByteArraySerializer, new StringSerializer)
-      .withBootstrapServers("localhost:9092")
+      .withBootstrapServers(s"$host:$port")
 }
 
-class RandomClickProducer(
-    actorSystem: ActorSystem,
-    whatOptions: Seq[String],
-    whereOptions: Seq[String]
-)(implicit materializer: Materializer) {
+class RandomClickProducer(actorSystem: ActorSystem,
+                          whatOptions: Seq[String],
+                          whereOptions: Seq[String],
+                          host: String,
+                          port: Int)(implicit materializer: Materializer) {
   def randomWhat  = whatOptions(Random.nextInt(whatOptions.length))
   def randomWhere = whereOptions(Random.nextInt(whereOptions.length))
 
-  def publishClicksWithPlainSink(amount: Int) =
+  def publishClicksWithPlainSink(amount: Int, topic: String) =
     Source(1 to amount)
       .map(_ => Clicked(randomWhat, randomWhere))
       .map(Json.toJson(_))
       .map(Json.stringify(_))
       .map { elem =>
-        new ProducerRecord[Array[Byte], String]("clicked", elem)
+        new ProducerRecord[Array[Byte], String](topic, elem)
       }
-      .runWith(Producer.plainSink(MessageProducer.settings(actorSystem)))
+      .runWith(
+        Producer.plainSink(MessageProducer.settings(actorSystem, host, port))
+      )
 }

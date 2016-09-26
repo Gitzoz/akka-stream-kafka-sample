@@ -37,10 +37,20 @@ object SampleApp {
     val whatOptions  = Seq("a", "b", "c", "d", "e", "f", "g", "h")
     val whereOptions = Seq("1", "2", "3", "4", "5", "6", "7", "8")
 
-    val producer      = new RandomClickProducer(system, whatOptions, whereOptions)
-    val printConsumer = new PrintClickedConsumer(system, 0).runConsumer
+    val host  = "localhost"
+    val port  = 9092
+    val topic = "clicked"
+
+    val producer =
+      new RandomClickProducer(system, whatOptions, whereOptions, host, port)
+    val printConsumer =
+      new PrintClickedConsumer(system, startAtOffset = 0, host, port)
+        .runConsumer(topic)
     val calculateConsumer =
-      new CalculateClickedMetricsConsumer(system, 0).runConsumer
+      new CalculateClickedMetricsConsumer(system,
+                                          startAtOffset = 0,
+                                          host,
+                                          port).runConsumer(topic)
 
     while (true) {
       println("Type 'add' to produce 10 Clicked")
@@ -50,7 +60,7 @@ object SampleApp {
         system.terminate()
         System.exit(0)
       } else if (input == "add") {
-        producer.publishClicksWithPlainSink(10)
+        producer.publishClicksWithPlainSink(10, topic)
       }
 
     }

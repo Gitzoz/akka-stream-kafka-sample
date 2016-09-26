@@ -38,16 +38,19 @@ import akka.stream.scaladsl.Sink
 import akka.stream.Materializer
 
 object MessageConsumer {
-  def settings(system: ActorSystem) =
+  def settings(system: ActorSystem, host: String, port: Int) =
     ConsumerSettings(system, new ByteArrayDeserializer, new StringDeserializer)
-      .withBootstrapServers("localhost:9092")
+      .withBootstrapServers(s"$host:$port")
       .withGroupId("group1")
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 }
 
-abstract class ClickedConsumer(actorSystem: ActorSystem, startAtOffset: Long)(
-    implicit materializer: Materializer
-) {
+abstract class ClickedConsumer(
+    actorSystem: ActorSystem,
+    startAtOffset: Long,
+    host: String,
+    port: Int
+)(implicit materializer: Materializer) {
   var offset = new AtomicLong(startAtOffset)
 
   def consume(record: ConsumerRecord[Array[Byte], String]): Future[Done]
@@ -57,17 +60,19 @@ abstract class ClickedConsumer(actorSystem: ActorSystem, startAtOffset: Long)(
       new TopicPartition(topic, partition) -> offset.get
     )
 
-  def runConsumer: Future[Done] =
+  def runConsumer(topic: String): Future[Done] =
     Consumer
-      .plainSource(MessageConsumer.settings(actorSystem),
-                   subscription("clicked"))
+      .plainSource(MessageConsumer.settings(actorSystem, host, port),
+                   subscription(topic))
       .mapAsync(1)(consume(_))
       .runWith(Sink.ignore)
 }
 
-class PrintClickedConsumer(actorSystem: ActorSystem, startAtOffset: Long)(
-    implicit materializer: Materializer
-) extends ClickedConsumer(actorSystem, startAtOffset) {
+class PrintClickedConsumer(actorSystem: ActorSystem,
+                           startAtOffset: Long,
+                           host: String,
+                           port: Int)(implicit materializer: Materializer)
+    extends ClickedConsumer(actorSystem, startAtOffset, host, port) {
   def consume(record: ConsumerRecord[Array[Byte], String]): Future[Done] = {
     val clicked = Json.parse(record.value).as[Clicked]
     offset.set(record.offset)
@@ -78,9 +83,11 @@ class PrintClickedConsumer(actorSystem: ActorSystem, startAtOffset: Long)(
 
 class CalculateClickedMetricsConsumer(
     actorSystem: ActorSystem,
-    startAtOffset: Long
+    startAtOffset: Long,
+    host: String,
+    port: Int
 )(implicit materializer: Materializer)
-    extends ClickedConsumer(actorSystem, startAtOffset) {
+    extends ClickedConsumer(actorSystem, startAtOffset, host, port) {
 
   var metric: Map[Clicked, Int] = Map.empty
 
