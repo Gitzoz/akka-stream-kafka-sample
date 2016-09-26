@@ -12,10 +12,9 @@ object MessagesOps {
       "what" -> model.what,
       "where" -> model.where)
   }
-  implicit val clickedReads = (
-    (JsPath \ "what").read[String] and
-    (JsPath \ "where").read[String])
-  (Clicked.apply _)
+  val clickedBuilder = (JsPath \ "what").read[String] and
+    (JsPath \ "where").read[String]
+  implicit val clickedReads: Reads[Clicked] = clickedBuilder(Clicked.apply _)
 }
 
 
