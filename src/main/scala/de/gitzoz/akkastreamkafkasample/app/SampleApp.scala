@@ -16,18 +16,13 @@
 
 package de.gitzoz.akkastreamkafkasample
 
-import akka.actor.ActorSystem
-import scala.concurrent.Await
-import scala.concurrent.duration._
-import akka.stream.ActorMaterializer
-import de.gitzoz.akkastreamkafkasample.domain.RandomClickProducer
-import de.gitzoz.akkastreamkafkasample.domain.ClickedConsumer
-import scala.util.Failure
-import scala.util.Success
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.StdIn
-import de.gitzoz.akkastreamkafkasample.domain.PrintClickedConsumer
+
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import de.gitzoz.akkastreamkafkasample.domain.CalculateClickedMetricsConsumer
+import de.gitzoz.akkastreamkafkasample.domain.PrintClickedConsumer
+import de.gitzoz.akkastreamkafkasample.domain.RandomClickProducer
 
 object SampleApp {
   def main(args: Array[String]): Unit = {

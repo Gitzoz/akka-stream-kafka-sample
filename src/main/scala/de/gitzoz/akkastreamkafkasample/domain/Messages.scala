@@ -16,9 +16,15 @@
 
 package de.gitzoz.akkastreamkafkasample.domain
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json.JsPath
+import play.api.libs.json.Json
+import play.api.libs.json.Json.toJsFieldJsValueWrapper
+import play.api.libs.json.Reads
+import play.api.libs.json.Reads.StringReads
+import play.api.libs.json.Reads.applicative
+import play.api.libs.json.Reads.functorReads
+import play.api.libs.json.Writes
 
 final case class Clicked(what: String, where: String)
 

@@ -22,20 +22,19 @@ import scala.concurrent.Future
 
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringDeserializer
 
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.ConsumerSettings
-import play.api.libs.json.Json
-
-import de.gitzoz.akkastreamkafkasample.domain.MessagesOps.clickedReads
-import akka.kafka.scaladsl.Consumer
 import akka.kafka.Subscriptions
-import org.apache.kafka.common.TopicPartition
-import akka.stream.scaladsl.Sink
+import akka.kafka.scaladsl.Consumer
 import akka.stream.Materializer
+import akka.stream.scaladsl.Sink
+import de.gitzoz.akkastreamkafkasample.domain.MessagesOps.clickedReads
+import play.api.libs.json.Json
 
 object MessageConsumer {
   def settings(system: ActorSystem, host: String, port: Int) =

@@ -18,19 +18,17 @@ package de.gitzoz.akkastreamkafkasample.domain
 
 import scala.util.Random
 
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.ByteArraySerializer
 import org.apache.kafka.common.serialization.StringSerializer
 
 import akka.actor.ActorSystem
 import akka.kafka.ProducerSettings
+import akka.kafka.scaladsl.Producer
+import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import de.gitzoz.akkastreamkafkasample.domain.MessagesOps.clickedWrites
 import play.api.libs.json.Json
-import org.apache.kafka.clients.producer.ProducerRecord
-import akka.kafka.scaladsl.Producer
-import akka.stream.ActorMaterializer
-import akka.stream.Materializer
-import akka.stream.scaladsl.Sink
 
 object MessageProducer {
   def settings(system: ActorSystem, host: String, port: Int) =
