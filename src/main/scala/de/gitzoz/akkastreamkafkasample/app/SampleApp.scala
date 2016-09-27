@@ -23,6 +23,8 @@ import akka.stream.ActorMaterializer
 import de.gitzoz.akkastreamkafkasample.domain.CalculateClickedMetricsConsumer
 import de.gitzoz.akkastreamkafkasample.domain.PrintClickedConsumer
 import de.gitzoz.akkastreamkafkasample.domain.RandomClickProducer
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.Await
 
 object SampleApp {
   def main(args: Array[String]): Unit = {
@@ -47,13 +49,14 @@ object SampleApp {
                                           host,
                                           port).runConsumer(topic)
 
-    while (true) {
+    var run = true
+    while (run) {
       println("Type 'add' to produce 10 Clicked")
       println("Enter exit to stop >>")
       val input = StdIn.readLine()
       if (input == "stop") {
-        system.terminate()
-        System.exit(0)
+        Await.result(system.terminate, 5.seconds)
+        run = false
       } else if (input == "add") {
         producer.publishClicksWithPlainSink(10, topic)
       }
